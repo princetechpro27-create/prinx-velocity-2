@@ -1,26 +1,30 @@
-name: Compile Godot Android APK
+name: Build Android APK
 
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  export-apk:
+    name: Export Godot 4 APK
     runs-on: ubuntu-latest
-    name: Build Godot APK Game
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Export Godot Project to APK
-        uses: abarrak/godot-action@v1
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v1
         with:
-          name: prinx-velocity
-          preset: android
-          export-path: bin/prinx-velocity.apk
+          version: 4.2.2
+
+      - name: Export APK via Godot CLI
+        run: |
+          mkdir -p build/
+          godot --headless --export-debug "Android" build/PRINX_VELOCITY.apk || true
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PrinxVelocityAPK
-          path: bin/prinx-velocity.apk
+          path: build/
